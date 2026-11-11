@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CanteenX</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <h1>CanteenX</h1>
+  <nav class="tabs" role="tablist" aria-label="Choose your view">
+    <button role="tab" id="tabStudent" data-tab="student" aria-selected="true">Student</button>
+    <button role="tab" id="tabTeam" data-tab="team" aria-selected="false">Canteen team</button>
+  </nav>
+</header>
+
+<!-- STUDENT -->
+<section id="studentView" role="tabpanel" aria-labelledby="tabStudent">
+  <div class="bar">
+    <label>Show
+      <select id="sTag"><option value="">All meals</option><option>Veg</option><option>Protein</option><option>Carb-heavy</option><option>Light</option><option>Treat</option></select>
+    </label>
+  </div>
+  <div class="pills" id="dayPills" role="group" aria-label="Pick a day"></div>
+  <div class="split">
+    <div id="menuList"></div>
+    <aside class="side">
+      <h2>Your order</h2>
+      <h3 class="step"><span>1</span>Your name</h3>
+      <input id="sName" maxlength="30" placeholder="e.g. Ananya" aria-label="Your name" autocomplete="off">
+      <h3 class="step"><span>2</span>Pickup time</h3>
+      <ul id="cart" class="orders"></ul>
+      <p id="cartTotal" class="muted"></p>
+      <h3 class="step"><span>3</span>Payment</h3>
+      <fieldset class="pay">
+        <legend class="sr">Pay with</legend>
+        <label class="chip2"><input type="radio" name="pay" value="wallet"><span>Wallet</span><em id="walBal"></em></label>
+        <label class="chip2"><input type="radio" name="pay" value="upi"><span>UPI</span></label>
+        <input id="upiId" placeholder="name@bank" autocomplete="off" aria-label="UPI ID" hidden>
+        <label class="chip2"><input type="radio" name="pay" value="cash"><span>Cash at pickup</span></label>
+        <div class="topup"><span class="muted">Top up wallet</span>
+          <button type="button" class="btn" data-amt="100">+₹100</button>
+          <button type="button" class="btn" data-amt="200">+₹200</button>
+          <button type="button" class="btn" data-amt="500">+₹500</button>
+        </div>
+      </fieldset>
+      <p id="payMsg" class="err" role="alert"></p>
+      <button id="placeOrder" class="btn primary wide" disabled>Place order</button>
+      <h2 class="mt">My orders</h2>
+      <ul id="myOrders" class="orders"></ul>
+      <p id="mySpend" class="muted"></p>
+    </aside>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section id="teamView" role="tabpanel" aria-labelledby="tabTeam" hidden>
+  <div id="teamLogin" class="login">
+    <form id="loginForm">
+      <h2>Staff sign in</h2>
+      <p class="muted">Enter your staff ID to manage the menu, stock and orders.</p>
+      <label>Staff ID <input id="staffId" autocomplete="off" placeholder="CX-1001" required></label>
+      <p id="loginMsg" class="err" role="alert"></p>
+      <button class="btn primary wide" type="submit">Sign in</button>
+      <p id="loginHint" class="muted"></p>
+    </form>
+  </div>
+
+  <div id="teamApp" hidden>
+    <div class="bar who">
+      <span id="who"></span><span class="spacer"></span>
+      <button id="signOut" class="btn">Sign out</button>
+    </div>
+    <div class="stats" id="tStats"></div>
+
+    <h2 class="sec">Orders</h2>
+    <div class="bar"><span class="muted">Accept new orders, then move them through the kitchen.</span><span class="spacer"></span><button id="clearDone" class="btn">Remove finished orders</button></div>
+    <div class="board" id="board"></div>
+
+    <details class="panel" id="stockPanel" open>
+      <summary>Stock</summary>
+      <div class="bar">
+        <label>Day <select id="stDay"></select></label>
+        <span class="spacer"></span>
+        <button id="stLow" class="btn">Top up low items to 20</button>
+      </div>
+      <ul id="stockList" class="stock"></ul>
+    </details>
+
+    <details class="panel" id="foodPanel">
+      <summary>Add a new food</summary>
+      <form id="foodForm">
+        <datalist id="foodNames"></datalist>
+        <div class="grid3">
+          <label>Food name <input id="nName" list="foodNames" required maxlength="60" placeholder="e.g. Veg biryani"></label>
+          <label>Category <select id="nSlot"></select></label>
+          <label>Tag <select id="nTag"><option>Veg</option><option>Protein</option><option>Carb-heavy</option><option>Light</option><option>Treat</option></select></label>
+          <label>Price (₹) <input id="nPrice" type="number" min="0" step="5" value="60"></label>
+          <label>Stock per day <input id="nStock" type="number" min="0" value="20" placeholder="unlimited"></label>
+        </div>
+        <fieldset class="days"><legend>Serve on</legend>
+          <label class="chip"><input type="checkbox" id="nAll"> Whole week</label>
+          <span id="foodDays"></span>
+        </fieldset>
+        <button class="btn primary" type="submit">Add to menu</button>
+      </form>
+    </details>
+
+    <div class="bar">
+      <h2>Weekly menu</h2><span class="spacer"></span>
+      <label class="inline">Orders per pickup slot <input id="capIn" type="number" min="1" value="10"></label>
+      <button id="shuffle" class="btn">Fill empty slots</button>
+      <button id="export" class="btn">Export</button>
+      <button id="import" class="btn">Import</button>
+      <button id="clear" class="btn danger">Clear week</button>
+      <input type="file" id="file" accept="application/json" hidden>
+    </div>
+    <div class="scroll"><div class="matrix" id="matrix" role="grid" aria-label="Weekly menu"></div></div>
+
+    <h2 class="sec">Demand by meal</h2>
+    <ul id="demand" class="demand"></ul>
+
+    <h2 class="sec">Staff</h2>
+    <ul id="staffList" class="demand"></ul>
+    <form id="staffForm" class="bar">
+      <label>New staff name <input id="stName" required maxlength="40" placeholder="e.g. Asha Nair"></label>
+      <button class="btn" type="submit">Add staff and create ID</button>
+    </form>
+  </div>
+</section>
+
+<dialog id="mealDialog">
+  <form id="mealForm">
+    <h2 id="dlgTitle">Add meal</h2>
+    <label>Meal name <input id="fName" required maxlength="60" placeholder="e.g. Idli and sambar"></label>
+    <div class="row">
+      <label>Price (₹) <input id="fPrice" type="number" min="0" step="5" value="60"></label>
+      <label>Stock <small>(blank = unlimited)</small><input id="fStock" type="number" min="0" placeholder="unlimited"></label>
+    </div>
+    <label>Tag
+      <select id="fTag"><option>Veg</option><option>Protein</option><option>Carb-heavy</option><option>Light</option><option>Treat</option></select>
+    </label>
+    <label class="check"><input type="checkbox" id="fOff"> Mark as sold out</label>
+    <div class="actions">
+      <button type="button" id="fDelete" class="btn danger">Delete</button>
+      <span class="spacer"></span>
+      <button type="button" id="fCancel" class="btn">Cancel</button>
+      <button type="submit" class="btn primary">Save meal</button>
+    </div>
+  </form>
+</dialog>
+<div id="toast" role="status" aria-live="polite"></div>
+<script src="script.js"></script>
+</body>
+</html>
